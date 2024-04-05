@@ -52,4 +52,14 @@ export class BezSeg implements Seg {
             return [...BezSeg.toLines(...bez1, tolerance), ...BezSeg.toLines(...bez2, tolerance)];
         }
     }
+
+    public length(tolerance: number): number {
+        return BezSeg.toLines(this.start, this.c1, this.c2, this.end, tolerance)
+            .map((lineSeg) => lineSeg.length())
+            .reduce((a, b) => a + b, 0);
+    }
+
+    public reversed(): BezSeg {
+        return new BezSeg(this.end, this.c2, this.c1, this.start);
+    }
 }

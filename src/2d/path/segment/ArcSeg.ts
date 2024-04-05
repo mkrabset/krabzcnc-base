@@ -111,7 +111,7 @@ export class ArcSeg implements Seg {
         }
     }
 
-    public reversed(): LineSeg {
+    public reversed(): ArcSeg {
         return new ArcSeg(this.end, this.start, this.radius, !this.clockwise);
     }
 

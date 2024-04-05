@@ -40,4 +40,8 @@ export class LineSeg implements Seg {
     public midpoint(): Vector2d {
         return this.start.plus(this.end).multiply(0.5);
     }
+
+    public length(tolerance?: number): number {
+        return Vector2d.dist(this.start, this.end);
+    }
 }

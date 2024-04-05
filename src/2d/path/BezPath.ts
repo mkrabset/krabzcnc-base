@@ -18,4 +18,8 @@ export class BezPath {
     public isClosed(): boolean {
         return this.segs.length > 1 && this.first().start.equals(this.last().end);
     }
+
+    public length(tolerance: number): number {
+        return this.segs.map((seg) => seg.length(tolerance)).reduce((a, b) => a + b, 0);
+    }
 }
