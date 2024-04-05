@@ -2,6 +2,7 @@ import { Vector2d } from '../../Vector2d';
 import { BoundingBox } from '../../bounds';
 import { Seg } from './Seg';
 import { SegType } from './SegType';
+import { Matrix3x3 } from '../../Matrix3x3';
 
 /**
  * Straight line segment
@@ -43,5 +44,17 @@ export class LineSeg implements Seg {
 
     public length(tolerance?: number): number {
         return Vector2d.dist(this.start, this.end);
+    }
+
+    public transformed(matrix: Matrix3x3): LineSeg {
+        return new LineSeg(matrix.transform(this.start), matrix.transform(this.end));
+    }
+
+    public toJson(): { type: string; s: [number, number]; e: [number, number] } {
+        return {
+            type: 'line',
+            s: [this.start.x, this.start.y],
+            e: [this.end.x, this.end.y]
+        };
     }
 }

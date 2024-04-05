@@ -4,6 +4,7 @@ import { ArcSeg } from './ArcSeg';
 import { LASeg, Seg } from './Seg';
 import { LineSeg } from './LineSeg';
 import { SegType } from './SegType';
+import { Matrix3x3 } from '../../Matrix3x3';
 
 /**
  * Cubic bezier segment
@@ -61,5 +62,19 @@ export class BezSeg implements Seg {
 
     public reversed(): BezSeg {
         return new BezSeg(this.end, this.c2, this.c1, this.start);
+    }
+
+    public transformed(matrix: Matrix3x3): BezSeg {
+        return new BezSeg(matrix.transform(this.start), matrix.transform(this.c1), matrix.transform(this.c2), matrix.transform(this.end));
+    }
+
+    public toJson(): { type: string; s: [number, number]; c1: [number, number]; c2: [number, number]; e: [number, number] } {
+        return {
+            type: 'bez',
+            s: [this.start.x, this.start.y],
+            c1: [this.c1.x, this.c1.y],
+            c2: [this.c2.x, this.c2.y],
+            e: [this.end.x, this.end.y]
+        };
     }
 }

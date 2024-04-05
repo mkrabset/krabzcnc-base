@@ -1,4 +1,5 @@
 import { LBSeg } from './segment/Seg';
+import { Matrix3x3 } from '../Matrix3x3';
 
 export class BezPath {
     public readonly segs: LBSeg[];
@@ -21,5 +22,13 @@ export class BezPath {
 
     public length(tolerance: number): number {
         return this.segs.map((seg) => seg.length(tolerance)).reduce((a, b) => a + b, 0);
+    }
+
+    public transformed(matrix: Matrix3x3): BezPath {
+        return new BezPath(this.segs.map((seg) => seg.transformed(matrix)));
+    }
+
+    public toJson(): object[] {
+        return this.segs.map((seg) => seg.toJson());
     }
 }

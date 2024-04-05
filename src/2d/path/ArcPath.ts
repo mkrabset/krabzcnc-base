@@ -129,4 +129,8 @@ export class ArcPath {
             return result;
         }
     }
+
+    public toJson(): object[] {
+        return this.segs.map((seg) => seg.toJson());
+    }
 }

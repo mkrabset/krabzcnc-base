@@ -160,4 +160,14 @@ export class ArcSeg implements Seg {
     public splitAt(p: Vector2d): [ArcSeg, ArcSeg] {
         return [new ArcSeg(this.start, p, this.radius, this.clockwise), new ArcSeg(p, this.end, this.radius, this.clockwise)];
     }
+
+    public toJson(): { type: string; s: [number, number]; e: [number, number]; r: number; cw: boolean } {
+        return {
+            type: 'arc',
+            s: [this.start.x, this.start.y],
+            e: [this.end.x, this.end.y],
+            r: this.radius,
+            cw: this.clockwise
+        };
+    }
 }
