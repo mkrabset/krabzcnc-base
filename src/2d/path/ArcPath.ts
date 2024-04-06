@@ -16,7 +16,7 @@ export class ArcPath {
         // Assert continuous
         this.segs.forEach((seg, index) => {
             if (!seg.end.equals(this.segs[(index + 1) % this.segs.length].start)) {
-                throw 'err';
+                throw 'Path is not continuous';
             }
         });
     }
