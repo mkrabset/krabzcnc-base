@@ -69,14 +69,16 @@ export class ArcSeg implements Seg {
     }
 
     public getBounds(): BoundingBox {
+        const endpointAtNorthSouthAxis = this.start.x===this.center.x || this.end.x===this.center.x
+        const endpointAtEastWestAxis = this.start.y===this.center.y || this.end.y===this.center.y
         const startWest: boolean = this.start.x < this.center.x;
         const endWest: boolean = this.end.x < this.center.x;
         const startSouth: boolean = this.start.y < this.center.y;
         const endSouth: boolean = this.end.y < this.center.y;
 
         const defaultBounds: BoundingBox = BoundingBox.fromPoints(this.start, this.end);
-        if (startWest === endWest) {
-            if (startSouth === endSouth) {
+        if (startWest === endWest || endpointAtNorthSouthAxis) {
+            if (startSouth === endSouth || endpointAtEastWestAxis) {
                 // Same quadrant
                 return defaultBounds;
             } else {
@@ -85,7 +87,7 @@ export class ArcSeg implements Seg {
                 return defaultBounds.extendWithPoint(extension);
             }
         } else {
-            if (startSouth === endSouth) {
+            if (startSouth === endSouth || endpointAtEastWestAxis) {
                 // Crossing y-axis north or south
                 const extension = startSouth ? this.center.minus(new Vector2d(0, this.radius)) : this.center.plus(new Vector2d(0, this.radius));
                 return defaultBounds.extendWithPoint(extension);
