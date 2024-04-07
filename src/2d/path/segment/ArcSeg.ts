@@ -69,8 +69,8 @@ export class ArcSeg implements Seg {
     }
 
     public getBounds(): BoundingBox {
-        const endpointAtNorthSouthAxis = this.start.x===this.center.x || this.end.x===this.center.x
-        const endpointAtEastWestAxis = this.start.y===this.center.y || this.end.y===this.center.y
+        const endpointAtNorthSouthAxis = this.start.x === this.center.x || this.end.x === this.center.x;
+        const endpointAtEastWestAxis = this.start.y === this.center.y || this.end.y === this.center.y;
         const startWest: boolean = this.start.x < this.center.x;
         const endWest: boolean = this.end.x < this.center.x;
         const startSouth: boolean = this.start.y < this.center.y;
