@@ -1,16 +1,18 @@
-import {LBSeg} from './segment/Seg';
-import {Matrix3x3} from '../Matrix3x3';
-import {BezSeg, LineSeg, SegType} from "./segment";
+import { LBSeg } from './segment/Seg';
+import { Matrix3x3 } from '../Matrix3x3';
+import { BezSeg, LineSeg, SegType } from './segment';
+import { Vector2d } from '../Vector2d';
+import { BoundingBox } from '../bounds';
 
 export class BezPath {
     public readonly segs: LBSeg[];
 
     constructor(segs: LBSeg[]) {
-        this.segs = segs.filter(seg => !(seg.segType === SegType.LINE && seg.start.equals(seg.end)));  // Remove empty lines
+        this.segs = segs.filter((seg) => !(seg.segType === SegType.LINE && seg.start.equals(seg.end))); // Remove empty lines
 
         // Check continuity
         this.segs.forEach((seg, index) => {
-            const prev = this.segs[index - 1]
+            const prev = this.segs[index - 1];
             if (index > 0 && !seg.start.equals(prev.end)) {
                 throw 'Path is not continuous, disruption at index ' + index;
             }
@@ -42,10 +44,24 @@ export class BezPath {
     }
 
     public fromJson(segs: object[]): BezPath {
-        return new BezPath(segs.map((seg: any) => {
-            return (seg.type === 'line')
-                ? LineSeg.fromJson(seg)
-                : BezSeg.fromJson(seg)
-        }))
+        return new BezPath(
+            segs.map((seg: any) => {
+                return seg.type === 'line' ? LineSeg.fromJson(seg) : BezSeg.fromJson(seg);
+            })
+        );
+    }
+
+    public simplify(tolerance: number): BezPath {
+        const tmp: LBSeg[] = this.segs.map((seg) => {
+            if (seg.segType === SegType.BEZ) {
+                const bezSeg: BezSeg = seg as BezSeg;
+                const maxBounds = BoundingBox.merge([BoundingBox.fromPoints(bezSeg.start, bezSeg.end), BoundingBox.fromPoints(bezSeg.c1, bezSeg.c2)]) as BoundingBox;
+                if (Vector2d.dist(maxBounds.min, maxBounds.max) < tolerance / 2) {
+                    return new LineSeg(seg.start, seg.end);
+                }
+            }
+            return seg;
+        });
+        return new BezPath(LineSeg.simplifyLineSequences(tmp, tolerance) as LBSeg[]);
     }
 }

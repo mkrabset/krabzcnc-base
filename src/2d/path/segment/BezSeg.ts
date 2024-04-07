@@ -68,7 +68,7 @@ export class BezSeg implements Seg {
         return new BezSeg(matrix.transform(this.start), matrix.transform(this.c1), matrix.transform(this.c2), matrix.transform(this.end));
     }
 
-    public toJson(): { type: string, s: [number, number], c1: [number, number], c2: [number, number], e: [number, number] } {
+    public toJson(): { type: string; s: [number, number]; c1: [number, number]; c2: [number, number]; e: [number, number] } {
         return {
             type: 'bez',
             s: [this.start.x, this.start.y],
@@ -78,7 +78,7 @@ export class BezSeg implements Seg {
         };
     }
 
-    public static fromJson(json: { type: string, s: [number, number], c1: [number, number], c2: [number, number], e: [number, number] }): BezSeg {
-        return new BezSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.c1[0], json.c1[1]), new Vector2d(json.c2[0], json.c2[1]), new Vector2d(json.e[0], json.e[1]))
+    public static fromJson(json: { type: string; s: [number, number]; c1: [number, number]; c2: [number, number]; e: [number, number] }): BezSeg {
+        return new BezSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.c1[0], json.c1[1]), new Vector2d(json.c2[0], json.c2[1]), new Vector2d(json.e[0], json.e[1]));
     }
 }

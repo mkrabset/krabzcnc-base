@@ -1,7 +1,6 @@
-import {ArcSeg, LASeg, LineSeg, SegType} from './segment';
-import {Circle, Line} from '../shapes';
-import {Vector2d} from '../Vector2d';
-import {BoundingBox} from '../bounds';
+import { ArcSeg, LASeg, LineSeg, SegType } from './segment';
+import { Circle } from '../shapes';
+import { BoundingBox } from '../bounds';
 
 export class ArcPath {
     public readonly segs: LASeg[];
@@ -84,7 +83,7 @@ export class ArcPath {
     }
 
     public simplify(tolerance: number): ArcPath {
-        const tmp1: LASeg[] = this.segs.map((seg) => {
+        const tmp: LASeg[] = this.segs.map((seg) => {
             if (seg.segType === SegType.ARC) {
                 const arcSeg: ArcSeg = seg as ArcSeg;
                 if (Circle.getLineError(arcSeg.start, arcSeg.end, arcSeg.center, arcSeg.radius, arcSeg.clockwise) < tolerance / 2) {
@@ -93,41 +92,7 @@ export class ArcPath {
             }
             return seg;
         });
-        const result: LASeg[] = [];
-        let currLines: LineSeg[] = [];
-        tmp1.forEach((seg) => {
-            if (seg.segType === SegType.LINE) {
-                currLines.push(seg as LineSeg);
-            } else {
-                if (currLines.length > 0) {
-                    ArcPath.simplifyLines(currLines, tolerance).forEach((seg) => result.push(seg));
-                }
-                result.push(seg);
-                currLines = [];
-            }
-        });
-        if (currLines.length > 0) {
-            ArcPath.simplifyLines(currLines, tolerance).forEach((seg) => result.push(seg));
-        }
-        return new ArcPath(result);
-    }
-
-    private static simplifyLines(lines: LineSeg[], tolerance: number): LineSeg[] {
-        if (lines.length === 1) {
-            return lines;
-        } else {
-            const points: Vector2d[] = lines.map((line) => line.start);
-            points.push(lines[lines.length - 1].end);
-
-            const simpPoints: Vector2d[] = Line.rdp(points, tolerance);
-            const result: LineSeg[] = [];
-            simpPoints.forEach((point, index) => {
-                if (index < simpPoints.length - 1) {
-                    result.push(new LineSeg(point, simpPoints[index + 1]));
-                }
-            });
-            return result;
-        }
+        return new ArcPath(LineSeg.simplifyLineSequences(tmp, tolerance) as LASeg[]);
     }
 
     public toJson(): object[] {
@@ -135,10 +100,10 @@ export class ArcPath {
     }
 
     public fromJson(segs: object[]): ArcPath {
-        return new ArcPath(segs.map((seg: any) => {
-            return (seg.type === 'line')
-                ? LineSeg.fromJson(seg)
-                : ArcSeg.fromJson(seg)
-        }))
+        return new ArcPath(
+            segs.map((seg: any) => {
+                return seg.type === 'line' ? LineSeg.fromJson(seg) : ArcSeg.fromJson(seg);
+            })
+        );
     }
 }

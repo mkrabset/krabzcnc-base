@@ -3,6 +3,7 @@ import { BoundingBox } from '../../bounds';
 import { Seg } from './Seg';
 import { SegType } from './SegType';
 import { Matrix3x3 } from '../../Matrix3x3';
+import { Line } from '../../shapes';
 
 /**
  * Straight line segment
@@ -50,7 +51,7 @@ export class LineSeg implements Seg {
         return new LineSeg(matrix.transform(this.start), matrix.transform(this.end));
     }
 
-    public toJson(): { type: string, s: [number, number], e: [number, number] } {
+    public toJson(): { type: string; s: [number, number]; e: [number, number] } {
         return {
             type: 'line',
             s: [this.start.x, this.start.y],
@@ -58,7 +59,45 @@ export class LineSeg implements Seg {
         };
     }
 
-    public static fromJson(json: { type: string, s: [number, number], e: [number, number] }): LineSeg {
-        return new LineSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.e[0], json.e[1]))
+    public static fromJson(json: { type: string; s: [number, number]; e: [number, number] }): LineSeg {
+        return new LineSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.e[0], json.e[1]));
+    }
+
+    public static simplifyLineSequences(segs: Seg[], tolerance: number): Seg[] {
+        const result: Seg[] = [];
+        let currLines: LineSeg[] = [];
+        segs.forEach((seg) => {
+            if (seg.segType === SegType.LINE) {
+                currLines.push(seg as LineSeg);
+            } else {
+                if (currLines.length > 0) {
+                    LineSeg.simplifyLines(currLines, tolerance).forEach((seg) => result.push(seg));
+                }
+                result.push(seg);
+                currLines = [];
+            }
+        });
+        if (currLines.length > 0) {
+            LineSeg.simplifyLines(currLines, tolerance).forEach((seg) => result.push(seg));
+        }
+        return result;
+    }
+
+    private static simplifyLines(lines: LineSeg[], tolerance: number): LineSeg[] {
+        if (lines.length === 1) {
+            return lines;
+        } else {
+            const points: Vector2d[] = lines.map((line) => line.start);
+            points.push(lines[lines.length - 1].end);
+
+            const simpPoints: Vector2d[] = Line.rdp(points, tolerance);
+            const result: LineSeg[] = [];
+            simpPoints.forEach((point, index) => {
+                if (index < simpPoints.length - 1) {
+                    result.push(new LineSeg(point, simpPoints[index + 1]));
+                }
+            });
+            return result;
+        }
     }
 }
