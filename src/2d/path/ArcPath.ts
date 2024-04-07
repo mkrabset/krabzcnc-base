@@ -1,7 +1,7 @@
-import { ArcSeg, LASeg, LineSeg, SegType } from './segment';
-import { Circle, Line } from '../shapes';
-import { Vector2d } from '../Vector2d';
-import { BoundingBox } from '../bounds';
+import {ArcSeg, LASeg, LineSeg, SegType} from './segment';
+import {Circle, Line} from '../shapes';
+import {Vector2d} from '../Vector2d';
+import {BoundingBox} from '../bounds';
 
 export class ArcPath {
     public readonly segs: LASeg[];
@@ -16,7 +16,7 @@ export class ArcPath {
         // Assert continuous
         this.segs.forEach((seg, index) => {
             if (!seg.end.equals(this.segs[(index + 1) % this.segs.length].start)) {
-                throw 'Path is not continuous';
+                throw 'Path is not continuous, disruption after index ' + index;
             }
         });
     }
@@ -132,5 +132,13 @@ export class ArcPath {
 
     public toJson(): object[] {
         return this.segs.map((seg) => seg.toJson());
+    }
+
+    public fromJson(segs: object[]): ArcPath {
+        return new ArcPath(segs.map((seg: any) => {
+            return (seg.type === 'line')
+                ? LineSeg.fromJson(seg)
+                : ArcSeg.fromJson(seg)
+        }))
     }
 }

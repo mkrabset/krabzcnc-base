@@ -1,9 +1,9 @@
-import { Vector2d } from '../../Vector2d';
-import { Circle } from '../../shapes';
-import { BoundingBox } from '../../bounds';
-import { LASeg, Seg } from './Seg';
-import { LineSeg } from './LineSeg';
-import { SegType } from './SegType';
+import {Vector2d} from '../../Vector2d';
+import {Circle} from '../../shapes';
+import {BoundingBox} from '../../bounds';
+import {LASeg, Seg} from './Seg';
+import {LineSeg} from './LineSeg';
+import {SegType} from './SegType';
 
 /**
  * Circular arc segment
@@ -161,7 +161,7 @@ export class ArcSeg implements Seg {
         return [new ArcSeg(this.start, p, this.radius, this.clockwise), new ArcSeg(p, this.end, this.radius, this.clockwise)];
     }
 
-    public toJson(): { type: string; s: [number, number]; e: [number, number]; r: number; cw: boolean } {
+    public toJson(): { type: string, s: [number, number], e: [number, number], r: number, cw: boolean } {
         return {
             type: 'arc',
             s: [this.start.x, this.start.y],
@@ -169,5 +169,9 @@ export class ArcSeg implements Seg {
             r: this.radius,
             cw: this.clockwise
         };
+    }
+
+    public static fromJson(json: { type: string, s: [number, number], e: [number, number], r: number, cw: boolean }): ArcSeg {
+        return new ArcSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.e[0], json.e[1]), json.r, json.cw)
     }
 }

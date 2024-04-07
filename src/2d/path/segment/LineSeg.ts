@@ -50,11 +50,15 @@ export class LineSeg implements Seg {
         return new LineSeg(matrix.transform(this.start), matrix.transform(this.end));
     }
 
-    public toJson(): { type: string; s: [number, number]; e: [number, number] } {
+    public toJson(): { type: string, s: [number, number], e: [number, number] } {
         return {
             type: 'line',
             s: [this.start.x, this.start.y],
             e: [this.end.x, this.end.y]
         };
+    }
+
+    public static fromJson(json: { type: string, s: [number, number], e: [number, number] }): LineSeg {
+        return new LineSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.e[0], json.e[1]))
     }
 }

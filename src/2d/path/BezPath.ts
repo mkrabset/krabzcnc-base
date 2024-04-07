@@ -1,11 +1,20 @@
-import { LBSeg } from './segment/Seg';
-import { Matrix3x3 } from '../Matrix3x3';
+import {LBSeg} from './segment/Seg';
+import {Matrix3x3} from '../Matrix3x3';
+import {BezSeg, LineSeg, SegType} from "./segment";
 
 export class BezPath {
     public readonly segs: LBSeg[];
 
     constructor(segs: LBSeg[]) {
-        this.segs = segs;
+        this.segs = segs.filter(seg => !(seg.segType === SegType.LINE && seg.start.equals(seg.end)));  // Remove empty lines
+
+        // Check continuity
+        this.segs.forEach((seg, index) => {
+            const prev = this.segs[index - 1]
+            if (index > 0 && !seg.start.equals(prev.end)) {
+                throw 'Path is not continuous, disruption at index ' + index;
+            }
+        });
     }
 
     public first(): LBSeg {
@@ -30,5 +39,13 @@ export class BezPath {
 
     public toJson(): object[] {
         return this.segs.map((seg) => seg.toJson());
+    }
+
+    public fromJson(segs: object[]): BezPath {
+        return new BezPath(segs.map((seg: any) => {
+            return (seg.type === 'line')
+                ? LineSeg.fromJson(seg)
+                : BezSeg.fromJson(seg)
+        }))
     }
 }
