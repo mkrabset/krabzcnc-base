@@ -1,6 +1,6 @@
-import {ArcSeg, LASeg, LineSeg, SegType} from './segment';
-import {Circle} from '../shapes';
-import {BoundingBox} from '../bounds';
+import { ArcSeg, LASeg, LineSeg, SegType } from './segment';
+import { Circle } from '../shapes';
+import { BoundingBox } from '../bounds';
 
 export class ArcPath {
     public readonly segs: LASeg[];
@@ -95,26 +95,22 @@ export class ArcPath {
         });
 
         // Remove tiny segments
-        const tmp2 = (LineSeg.simplifyLineSequences(tmp, tolerance) as LASeg[])
-            .filter(seg => !ArcPath.segTooTiny(seg))
+        const tmp2 = (LineSeg.simplifyLineSequences(tmp, tolerance) as LASeg[]).filter((seg) => !ArcPath.segTooTiny(seg));
 
         // Make continuous again after tiny seg removal
         const tmp3 = tmp2.map((seg, idx) => {
-            const next = tmp2[(idx + 1) % tmp2.length]
+            const next = tmp2[(idx + 1) % tmp2.length];
             if (seg.end.equals(next.start)) {
-                return seg
+                return seg;
             } else {
-                return (seg.segType === SegType.LINE)
-                    ? new LineSeg(seg.start, next.start)
-                    : new ArcSeg(seg.start, next.start, (seg as ArcSeg).radius, (seg as ArcSeg).clockwise)
+                return seg.segType === SegType.LINE ? new LineSeg(seg.start, next.start) : new ArcSeg(seg.start, next.start, (seg as ArcSeg).radius, (seg as ArcSeg).clockwise);
             }
-        })
+        });
         return new ArcPath(tmp3);
     }
 
     static segTooTiny(seg: LASeg): boolean {
-        return Math.abs(seg.start.x - seg.end.x) < 0.0000000001 &&
-            Math.abs(seg.start.y - seg.end.y) < 0.0000000001
+        return Math.abs(seg.start.x - seg.end.x) < 0.0000000001 && Math.abs(seg.start.y - seg.end.y) < 0.0000000001;
     }
 
     public toJson(): object[] {
