@@ -43,7 +43,7 @@ export class BezPath {
         return this.segs.map((seg) => seg.toJson());
     }
 
-    public fromJson(segs: object[]): BezPath {
+    public static fromJson(segs: object[]): BezPath {
         return new BezPath(
             segs.map((seg: any) => {
                 return seg.type === 'line' ? LineSeg.fromJson(seg) : BezSeg.fromJson(seg);

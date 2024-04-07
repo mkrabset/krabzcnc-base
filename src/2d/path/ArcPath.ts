@@ -99,7 +99,7 @@ export class ArcPath {
         return this.segs.map((seg) => seg.toJson());
     }
 
-    public fromJson(segs: object[]): ArcPath {
+    public static fromJson(segs: object[]): ArcPath {
         return new ArcPath(
             segs.map((seg: any) => {
                 return seg.type === 'line' ? LineSeg.fromJson(seg) : ArcSeg.fromJson(seg);
