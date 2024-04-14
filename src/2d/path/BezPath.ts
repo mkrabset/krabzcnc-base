@@ -6,6 +6,7 @@ import { BoundingBox } from '../bounds';
 
 export class BezPath {
     public readonly segs: LBSeg[];
+    private cachedBounds: BoundingBox | null;
 
     constructor(segs: LBSeg[]) {
         this.segs = segs.filter((seg) => !(seg.segType === SegType.LINE && seg.start.equals(seg.end))); // Remove empty lines
@@ -17,6 +18,7 @@ export class BezPath {
                 throw 'Path is not continuous, disruption at index ' + index;
             }
         });
+        this.cachedBounds = null;
     }
 
     public first(): LBSeg {
@@ -63,5 +65,22 @@ export class BezPath {
             return seg;
         });
         return new BezPath(LineSeg.simplifyLineSequences(tmp, tolerance) as LBSeg[]);
+    }
+
+    // Simple bounding box implementation, only using the control points
+    public getBounds(): BoundingBox {
+        if (this.cachedBounds === null) {
+            this.cachedBounds = BoundingBox.merge(
+                this.segs.map((seg) => {
+                    if (seg.segType === SegType.LINE) {
+                        return BoundingBox.fromPoints(seg.start, seg.end) as BoundingBox;
+                    } else {
+                        const bez: BezSeg = seg as BezSeg;
+                        return BoundingBox.merge([BoundingBox.fromPoints(bez.start, bez.c1), BoundingBox.fromPoints(bez.c2, bez.end)]) as BoundingBox;
+                    }
+                })
+            ) as BoundingBox;
+        }
+        return this.cachedBounds;
     }
 }
