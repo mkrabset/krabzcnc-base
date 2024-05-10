@@ -135,14 +135,21 @@ export class ArcPath {
      * @param splitSegIndex Index of the segment where the new entrypoint is located
      * @param newEntyPoint The new entrypoint
      */
-    public withNewEntryPoint(splitSegIndex: number, newEntyPoint: Vector2d): ArcPath {
+    public withNewEntryPoint(splitSegIndex: number, newEntryPoint: Vector2d, tolerance: number): ArcPath {
         if (!this.isClosed()) {
             throw 'ArcPath is not closed';
         }
         const before: LASeg[] = this.segs.slice(0, splitSegIndex);
         const after: LASeg[] = this.segs.slice(splitSegIndex + 1);
-        const splitted = this.segs[splitSegIndex].splitAt(newEntyPoint);
-        return new ArcPath([splitted[1], ...after, ...before, splitted[0]]);
+        const splitSeg = this.segs[splitSegIndex];
+        if (Vector2d.dist(newEntryPoint, splitSeg.start) < tolerance / 2) {
+            return new ArcPath([splitSeg, ...after, ...before]);
+        } else if (Vector2d.dist(newEntryPoint, splitSeg.end)) {
+            return new ArcPath([...before, ...after, splitSeg]);
+        } else {
+            const splitted = this.segs[splitSegIndex].splitAt(newEntryPoint);
+            return new ArcPath([splitted[1], ...after, ...before, splitted[0]]);
+        }
     }
 
     public toJson(): object[] {
