@@ -1,6 +1,7 @@
 import { ArcSeg, LASeg, LineSeg, SegType } from './segment';
 import { Circle } from '../shapes';
 import { BoundingBox } from '../bounds';
+import { Vector2d } from '../Vector2d';
 
 export class ArcPath {
     public readonly segs: LASeg[];
@@ -111,6 +112,37 @@ export class ArcPath {
 
     static segTooTiny(seg: LASeg): boolean {
         return Math.abs(seg.start.x - seg.end.x) < 0.0000000001 && Math.abs(seg.start.y - seg.end.y) < 0.0000000001;
+    }
+
+    public getSegmentClosestTo(point: Vector2d): { segIndex: number; point: Vector2d } {
+        let bestIdx: number = 0;
+        let bestDistSquared: number = -1;
+        let bestPoint: Vector2d = this.segs[0].start;
+        this.segs.forEach((seg: LASeg, idx: number) => {
+            const p: Vector2d = seg.getClosestPointTo(point);
+            const distSquared = Vector2d.distSquared(p, point);
+            if (bestDistSquared === -1 || distSquared < bestDistSquared) {
+                bestIdx = idx;
+                bestDistSquared = distSquared;
+                bestPoint = p;
+            }
+        });
+        return { segIndex: bestIdx, point: bestPoint };
+    }
+
+    /**
+     * Returns a copy of this *CLOSED!* ArcPath where the entrypoint is moved to the given location
+     * @param splitSegIndex Index of the segment where the new entrypoint is located
+     * @param newEntyPoint The new entrypoint
+     */
+    public withNewEntryPoint(splitSegIndex: number, newEntyPoint: Vector2d): ArcPath {
+        if (!this.isClosed()) {
+            throw 'ArcPath is not closed';
+        }
+        const before: LASeg[] = this.segs.slice(0, splitSegIndex);
+        const after: LASeg[] = this.segs.slice(splitSegIndex + 1);
+        const splitted = this.segs[splitSegIndex].splitAt(newEntyPoint);
+        return new ArcPath([splitted[1], ...after, ...before, splitted[0]]);
     }
 
     public toJson(): object[] {

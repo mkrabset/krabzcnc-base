@@ -163,6 +163,17 @@ export class ArcSeg implements Seg {
         return [new ArcSeg(this.start, p, this.radius, this.clockwise), new ArcSeg(p, this.end, this.radius, this.clockwise)];
     }
 
+    public getClosestPointTo(point: Vector2d): Vector2d {
+        const t: number | null = Circle.getTValueForArcPos(point, this.start, this.end, this.center);
+        if (t !== null && t > 0 && t < 1) {
+            return this.center.plus(point.minus(this.center).normalize().multiply(this.radius));
+        } else {
+            const d1sq: number = Vector2d.distSquared(point, this.start);
+            const d2sq: number = Vector2d.distSquared(point, this.end);
+            return d1sq < d2sq ? this.start : this.end;
+        }
+    }
+
     public toJson(): { type: string; s: [number, number]; e: [number, number]; r: number; cw: boolean } {
         return {
             type: 'arc',

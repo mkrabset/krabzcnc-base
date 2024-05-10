@@ -51,6 +51,19 @@ export class LineSeg implements Seg {
         return new LineSeg(matrix.transform(this.start), matrix.transform(this.end));
     }
 
+    public getClosestPointTo(point: Vector2d): Vector2d {
+        const [a, b, c] = Line.lineEquation(this.start, this.end);
+        const q: Vector2d = Line.pointToLine(point, a, b, c);
+        const t: number = Line.tValue(q, this.start, this.end);
+        if (t < 0) {
+            return this.start;
+        } else if (t > 1) {
+            return this.end;
+        } else {
+            return q;
+        }
+    }
+
     public toJson(): { type: string; s: [number, number]; e: [number, number] } {
         return {
             type: 'line',

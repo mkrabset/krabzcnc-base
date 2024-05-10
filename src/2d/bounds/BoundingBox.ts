@@ -57,4 +57,40 @@ export class BoundingBox {
     public expand(offset: number) {
         return new BoundingBox(new Vector2d(this.min.x - offset, this.min.y - offset), new Vector2d(this.max.x + offset, this.max.y + offset));
     }
+
+    public shortestDistanceTo(point: Vector2d): number {
+        if (point.x < this.min.x) {
+            // Point is to the west (left) of box
+            if (point.y < this.min.y) {
+                return Vector2d.dist(point, this.min); // Point is sw of sw corner
+            } else if (point.y > this.max.y) {
+                return Vector2d.dist(point, new Vector2d(this.min.x, this.max.y)); // Point is nw of nw corner
+            } else {
+                return this.min.x - point.x; // Point is straight west of box
+            }
+        } else if (point.x > this.max.x) {
+            // Point is east of box
+            if (point.y < this.min.y) {
+                return Vector2d.dist(point, new Vector2d(this.max.x, this.min.y)); // Point is se of se corner
+            } else if (point.y > this.max.y) {
+                return Vector2d.dist(point, this.max); // Point is ne of ne corner
+            } else {
+                return point.x - this.max.x; // Point is straight east of box
+            }
+        } else {
+            // Point is within eastwest bounds of box
+            if (point.y < this.min.y) {
+                return this.min.y - point.y; // Point is straight south of box
+            } else if (point.y > this.max.y) {
+                return point.y - this.max.y; // Point is straight north of box
+            } else {
+                return 0; // Point is inside box
+            }
+        }
+    }
+
+    public largestDistanceTo(point: Vector2d): number {
+        const corners = [this.min, this.max, new Vector2d(this.min.x, this.max.y), new Vector2d(this.max.x, this.min.y)];
+        return corners.map((corner) => Vector2d.dist(point, corner)).reduce((a, b) => Math.max(a, b));
+    }
 }

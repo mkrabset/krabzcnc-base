@@ -65,4 +65,11 @@ export class Line {
             }
         }
     }
+
+    public static tValue(point: Vector2d, start: Vector2d, end: Vector2d): number {
+        const dx: number = end.x - start.x;
+        const dy: number = end.y - start.y;
+        const t: number = Math.abs(dx) > Math.abs(dy) ? (point.x - start.x) / (end.x - start.x) : (point.y - start.y) / (end.y - start.y);
+        return t;
+    }
 }
