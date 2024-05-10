@@ -144,8 +144,8 @@ export class ArcPath {
         const splitSeg = this.segs[splitSegIndex];
         if (Vector2d.dist(newEntryPoint, splitSeg.start) < tolerance / 2) {
             return new ArcPath([splitSeg, ...after, ...before]);
-        } else if (Vector2d.dist(newEntryPoint, splitSeg.end)) {
-            return new ArcPath([...before, ...after, splitSeg]);
+        } else if (Vector2d.dist(newEntryPoint, splitSeg.end) < tolerance / 2) {
+            return new ArcPath([...after, ...before, splitSeg]);
         } else {
             const splitted = this.segs[splitSegIndex].splitAt(newEntryPoint);
             return new ArcPath([splitted[1], ...after, ...before, splitted[0]]);
