@@ -68,6 +68,23 @@ export class ArcSeg implements Seg {
         return this.endAngle;
     }
 
+    public getLength(): number {
+        return Math.abs(ArcSeg.deltaAngle(this.getStartAngle(), this.getEndAngle(), this.clockwise)) * this.radius;
+    }
+
+    public getTValue(p: Vector2d): number {
+        const [arc1, _]: [ArcSeg, ArcSeg] = this.splitAt(p);
+        const totalAngle: number = ArcSeg.deltaAngle(this.getStartAngle(), this.getEndAngle(), this.clockwise);
+        const arc1Angle: number = ArcSeg.deltaAngle(arc1.getStartAngle(), arc1.getEndAngle(), this.clockwise);
+        return arc1Angle / totalAngle;
+    }
+
+    public getPosition(tValue: number): Vector2d {
+        const deltaAngle = ArcSeg.deltaAngle(this.getStartAngle(), this.getEndAngle(), this.clockwise);
+        const angle: number = this.getStartAngle() + deltaAngle * tValue;
+        return this.center.plus(new Vector2d(Math.cos(angle), Math.sin(angle)).multiply(this.radius));
+    }
+
     public getBounds(): BoundingBox {
         const endpointAtNorthSouthAxis = this.start.x === this.center.x || this.end.x === this.center.x;
         const endpointAtEastWestAxis = this.start.y === this.center.y || this.end.y === this.center.y;

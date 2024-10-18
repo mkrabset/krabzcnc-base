@@ -47,6 +47,20 @@ export class LineSeg implements Seg {
         return Vector2d.dist(this.start, this.end);
     }
 
+    public getLength(): number {
+        return Vector2d.dist(this.start, this.end);
+    }
+
+    public getTValue(p: Vector2d): number {
+        const d1 = Vector2d.dist(this.start, p);
+        const d2 = Vector2d.dist(p, this.end);
+        return d1 / (d1 + d2);
+    }
+
+    public getPosition(tValue: number): Vector2d {
+        return this.start.plus(this.end.minus(this.start).multiply(tValue));
+    }
+
     public transformed(matrix: Matrix3x3): LineSeg {
         return new LineSeg(matrix.transform(this.start), matrix.transform(this.end));
     }
