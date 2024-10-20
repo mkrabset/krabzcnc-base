@@ -14,9 +14,9 @@ export class ArcPath {
         this.cachedArea = null;
 
         // Assert continuous
-        this.segs.forEach((seg, index) => {
-            if (!seg.end.equals(this.segs[(index + 1) % this.segs.length].start)) {
-                throw 'Path is not continuous, disruption after index ' + index;
+        this.segs.forEach((seg: LASeg, idx: number) => {
+            if (idx > 0 && !this.segs[idx - 1].end.equals(seg.start)) {
+                throw `Path is not continuous, disruption after index ${idx - 1}`;
             }
         });
     }
@@ -59,6 +59,9 @@ export class ArcPath {
     }
 
     public getArea(tolerance: number): number {
+        if (!this.isClosed()) {
+            throw 'Cannot calculate area, ArcPath is not closed';
+        }
         if (this.cachedArea === null) {
             this.cachedArea =
                 0.5 *
@@ -96,7 +99,7 @@ export class ArcPath {
         });
 
         // Remove tiny segments
-        const tmp2 = (LineSeg.simplifyLineSequences(tmp, tolerance) as LASeg[]).filter((seg) => !ArcPath.segTooTiny(seg));
+        const tmp2: LASeg[] = (LineSeg.simplifyLineSequences(tmp, tolerance) as LASeg[]).filter((seg) => !ArcPath.segTooTiny(seg));
 
         // Make continuous again after tiny seg removal
         const tmp3 = tmp2.map((seg, idx) => {
@@ -137,7 +140,7 @@ export class ArcPath {
      */
     public withNewEntryPoint(splitSegIndex: number, newEntryPoint: Vector2d, tolerance: number): ArcPath {
         if (!this.isClosed()) {
-            throw 'ArcPath is not closed';
+            throw 'Cannot move entrypoint, ArcPath is not closed';
         }
         const before: LASeg[] = this.segs.slice(0, splitSegIndex);
         const after: LASeg[] = this.segs.slice(splitSegIndex + 1);
