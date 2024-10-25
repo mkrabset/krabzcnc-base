@@ -105,9 +105,15 @@ export class ArcPath {
         const tmp3 = tmp2.map((seg, idx) => {
             const next = tmp2[(idx + 1) % tmp2.length];
             if (seg.end.equals(next.start)) {
-                return seg;
+                return seg; // Normal case, next starts where current ends
             } else {
-                return seg.segType === SegType.LINE ? new LineSeg(seg.start, next.start) : new ArcSeg(seg.start, next.start, (seg as ArcSeg).radius, (seg as ArcSeg).clockwise);
+                const last = idx === tmp2.length - 1;
+                if (last && !this.isClosed()) {
+                    return seg; // If path is open and this is the last segment, next doesnt have to start where current ends, return current
+                } else {
+                    // Repair current so it ends where next begins
+                    return seg.segType === SegType.LINE ? new LineSeg(seg.start, next.start) : new ArcSeg(seg.start, next.start, (seg as ArcSeg).radius, (seg as ArcSeg).clockwise);
+                }
             }
         });
         return new ArcPath(tmp3);
