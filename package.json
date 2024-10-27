@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/mkrabset/krabzcnc-base.git"
   },
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Package with some basic stuff for 2d applications",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

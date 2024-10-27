@@ -67,19 +67,9 @@ export class BezPath {
         return new BezPath(LineSeg.simplifyLineSequences(tmp, tolerance) as LBSeg[]);
     }
 
-    // Simple bounding box implementation, only using the control points
     public getBounds(): BoundingBox {
         if (this.cachedBounds === null) {
-            this.cachedBounds = BoundingBox.merge(
-                this.segs.map((seg) => {
-                    if (seg.segType === SegType.LINE) {
-                        return BoundingBox.fromPoints(seg.start, seg.end) as BoundingBox;
-                    } else {
-                        const bez: BezSeg = seg as BezSeg;
-                        return BoundingBox.merge([BoundingBox.fromPoints(bez.start, bez.c1), BoundingBox.fromPoints(bez.c2, bez.end)]) as BoundingBox;
-                    }
-                })
-            ) as BoundingBox;
+            this.cachedBounds = BoundingBox.merge(this.segs.map((seg) => seg.getBounds())) as BoundingBox;
         }
         return this.cachedBounds;
     }

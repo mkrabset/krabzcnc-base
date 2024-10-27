@@ -5,6 +5,7 @@ import { LASeg, Seg } from './Seg';
 import { LineSeg } from './LineSeg';
 import { SegType } from './SegType';
 import { Matrix3x3 } from '../../Matrix3x3';
+import { BoundingBox } from '../../bounds';
 
 /**
  * Cubic bezier segment
@@ -45,6 +46,12 @@ export class BezSeg implements Seg {
         }
     }
 
+    public getBounds(): BoundingBox {
+        const [xmin, xmax]: [number, number] = CubicBezier.extremes(this.start.x, this.c1.x, this.c2.x, this.end.x);
+        const [ymin, ymax]: [number, number] = CubicBezier.extremes(this.start.y, this.c1.y, this.c2.y, this.end.y);
+        return new BoundingBox(new Vector2d(xmin, ymin), new Vector2d(xmax, ymax));
+    }
+
     private static toLines(s: Vector2d, c1: Vector2d, c2: Vector2d, e: Vector2d, tolerance: number): LineSeg[] {
         if (CubicBezier.isFlat(s, c1, c2, e, tolerance)) {
             return s.equals(e) ? [] : [new LineSeg(s, e)];
@@ -68,7 +75,13 @@ export class BezSeg implements Seg {
         return new BezSeg(matrix.transform(this.start), matrix.transform(this.c1), matrix.transform(this.c2), matrix.transform(this.end));
     }
 
-    public toJson(): { type: string; s: [number, number]; c1: [number, number]; c2: [number, number]; e: [number, number] } {
+    public toJson(): {
+        type: string;
+        s: [number, number];
+        c1: [number, number];
+        c2: [number, number];
+        e: [number, number];
+    } {
         return {
             type: 'bez',
             s: [this.start.x, this.start.y],

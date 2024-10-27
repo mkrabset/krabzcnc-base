@@ -21,6 +21,32 @@ export class CubicBezier {
         return omt3 * s + 3 * omt2 * t * c1 + 3 * omt * t2 * c2 + t3 * e;
     }
 
+    public static extremes(s: number, c1: number, c2: number, e: number): [min: number, max: number] {
+        const rootValues: number[] = [...CubicBezier.roots(s, c1, c2, e).filter((v) => v > 0 && v < 1)].map((t) => CubicBezier.calc(s, c1, c2, e, t));
+        return [Math.min(...[s, e, ...rootValues]), Math.max(...[s, e, ...rootValues])];
+    }
+
+    private static roots(s: number, c1: number, c2: number, e: number): number[] {
+        const a = -3 * s + 9 * c1 - 9 * c2 + 3 * e;
+        const b = 6 * s - 12 * c1 + 6 * c2;
+        const c = 3 * c1 - 3 * s;
+
+        if (a < 1e-12) {
+            return [-c / b];
+        }
+
+        const det = b * b - 4 * a * c;
+        if (det <= 0) {
+            if (Math.abs(det) < 1e-12) {
+                return [-b / (2 * a)];
+            } else {
+                return [];
+            }
+        }
+        const sqrtDet = Math.sqrt(det);
+        return [(-b - sqrtDet) / (2 * a), (-b + sqrtDet) / (2 * a)];
+    }
+
     /**
      * Splits a Bézier curve on the given t-value, and returns BezValues (control-points) for the two new curves
      */
