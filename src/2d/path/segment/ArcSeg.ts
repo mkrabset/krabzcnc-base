@@ -1,9 +1,9 @@
-import {Vector2d} from '../../Vector2d';
-import {Circle} from '../../shapes';
-import {BoundingBox} from '../../bounds';
-import {LASeg, Seg} from './Seg';
-import {LineSeg} from './LineSeg';
-import {SegType} from './SegType';
+import { Vector2d } from '../../Vector2d';
+import { Circle } from '../../shapes';
+import { BoundingBox } from '../../bounds';
+import { LASeg, Seg } from './Seg';
+import { LineSeg } from './LineSeg';
+import { SegType } from './SegType';
 
 /**
  * Circular arc segment
@@ -201,24 +201,18 @@ export class ArcSeg implements Seg {
         };
     }
 
-    public static fromJson(json: {
-        type: string;
-        s: [number, number];
-        e: [number, number];
-        r: number;
-        cw: boolean
-    }): ArcSeg {
+    public static fromJson(json: { type: string; s: [number, number]; e: [number, number]; r: number; cw: boolean }): ArcSeg {
         return new ArcSeg(new Vector2d(json.s[0], json.s[1]), new Vector2d(json.e[0], json.e[1]), json.r, json.cw);
     }
 
     public toBezPoints(): [s: Vector2d, c1: Vector2d, c2: Vector2d, e: Vector2d] {
-        const a: Vector2d = this.start.minus(this.center)
-        const b: Vector2d = this.end.minus(this.center)
-        const q1: number = a.lengthSquared()
-        const q2: number = q1 + a.dot(b)
-        const k2: number = (4 / 3) * (Math.sqrt(2 * q1 * q2) - q2) / a.cross(b)
-        const c1: Vector2d = this.center.plus(a).plus(a.rot90(false).multiply(k2))
-        const c2: Vector2d = this.center.plus(b).plus(b.rot90(true).multiply(k2))
-        return [this.start, c1, c2, this.end]
+        const a: Vector2d = this.start.minus(this.center);
+        const b: Vector2d = this.end.minus(this.center);
+        const q1: number = a.lengthSquared();
+        const q2: number = q1 + a.dot(b);
+        const k2: number = ((4 / 3) * (Math.sqrt(2 * q1 * q2) - q2)) / a.cross(b);
+        const c1: Vector2d = this.center.plus(a).plus(a.rot90(false).multiply(k2));
+        const c2: Vector2d = this.center.plus(b).plus(b.rot90(true).multiply(k2));
+        return [this.start, c1, c2, this.end];
     }
 }
