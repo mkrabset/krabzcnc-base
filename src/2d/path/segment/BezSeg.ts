@@ -11,11 +11,11 @@ import { BoundingBox } from '../../bounds';
  * Cubic bezier segment
  */
 export class BezSeg implements Seg {
-    segType: SegType = SegType.BEZ;
-    start: Vector2d;
-    c1: Vector2d;
-    c2: Vector2d;
-    end: Vector2d;
+    public readonly segType: SegType = SegType.BEZ;
+    public readonly start: Vector2d;
+    public readonly c1: Vector2d;
+    public readonly c2: Vector2d;
+    public readonly end: Vector2d;
 
     constructor(start: Vector2d, c1: Vector2d, c2: Vector2d, end: Vector2d) {
         this.start = start;
